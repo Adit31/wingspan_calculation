@@ -8,8 +8,8 @@ import cv2
 import streamlit as st
 import tempfile
 
-pose_landmark_model_path = 'C:\\Users\\aditg\\Downloads\\pose_landmarker_full.task'
-hand_landmark_model_path = 'C:\\Users\\aditg\\Downloads\\hand_landmarker.task'
+pose_landmark_model_path = 'pose_landmarker_full.task'
+hand_landmark_model_path = 'hand_landmarker.task'
 
 def draw_pose_landmarks_on_image(rgb_image, detection_result):
   pose_landmarks_list = detection_result.pose_landmarks
