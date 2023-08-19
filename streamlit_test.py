@@ -130,7 +130,7 @@ def calculate_wingspan(image_path_wingspan, length_inches, length_pixels):
 
         y_eye = (left_eye.y + right_eye.y)/2 *height
         y_heel = (left_heel.y + right_heel.y)/2 *height
-        forehead = 1.5 * abs(nose.y - y_eye)
+        forehead = 1.5 * abs(nose.y*height - y_eye)
 
         total_height_pixels = abs(y_eye - y_heel) + forehead
     
