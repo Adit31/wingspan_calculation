@@ -4,7 +4,6 @@ from mediapipe.tasks.python import vision
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import numpy as np
-# import cv2
 import streamlit as st
 import tempfile
 
@@ -107,7 +106,7 @@ if uploaded_file is not None:
     height_pixels = st.number_input("Enter the static height in pixels:", value=100.0)
 
     wingspan, annotated_image = calculate_wingspan(temp_path, height_meters, height_pixels)
+    wingspan *= 39.3701
     
     st.image(annotated_image, caption="Annotated Image", use_column_width=True)
-    
-    st.write("Wingspan is:", wingspan, "meters")
+    st.write("Wingspan is:", wingspan, "inches")
