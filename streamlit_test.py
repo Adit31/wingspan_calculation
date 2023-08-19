@@ -6,46 +6,9 @@ from mediapipe.framework.formats import landmark_pb2
 import numpy as np
 import streamlit as st
 import tempfile
-import cv2
 
 pose_landmark_model_path = 'pose_landmarker_full.task'
 hand_landmark_model_path = 'hand_landmarker.task'
-
-def calculate_height(image_path_height, length_inches, length_pixels):
-  mp_pose = mp.solutions.pose
-  pose = mp_pose.Pose()
-  
-  image = cv2.imread(image_path_height)
-  height, width, _ = image.shape
-  results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-  
-  if results.pose_landmarks:
-      nose = results.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE.value]
-      left_eye = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE.value]
-      right_eye = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE.value]
-      left_foot = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value]
-      right_foot = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value]
-      st.write(nose, left_eye, right_eye, left_foot, right_foot)
-  
-      nose_y = nose.y * height
-      left_eye_y = left_eye.y * height
-      right_eye_y = right_eye.y * height
-  
-      mid_eyes_y = (left_eye_y + right_eye_y) / 2
-      forehead_height = nose_y - mid_eyes_y
-      head_top_y = mid_eyes_y - forehead_height
-  
-      left_foot_y = left_foot.y * height
-      right_foot_y = right_foot.y * height
-      avg_foot_y = (left_foot_y + right_foot_y) / 2
-      height_pixels = avg_foot_y - head_top_y
-  
-      pixels_to_inches = length_inches / length_pixels
-  
-      height_inches = height_pixels * pixels_to_inches
-      return height_inches
-  else:
-    return 0
 
 def draw_pose_landmarks_on_image(rgb_image, detection_result):
   pose_landmarks_list = detection_result.pose_landmarks
@@ -154,7 +117,6 @@ if uploaded_file is not None:
     length_pixels = st.number_input("Enter the static height in pixels:", value=2.5)
 
     wingspan, height, annotated_image = calculate_wingspan(temp_path, length_inches, length_pixels)
-    # height = calculate_height(temp_path, length_inches, length_pixels)
     
     st.image(annotated_image, caption="Annotated Image", use_column_width=True)
     st.write("Wingspan is:", wingspan, "inches")
