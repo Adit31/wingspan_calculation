@@ -41,7 +41,7 @@ def calculate_height(image_path_height, length_inches, length_pixels):
   
       pixels_to_inches = length_inches / length_pixels
   
-      height_inches = height_pixels * ratio
+      height_inches = height_pixels * pixels_to_inches
       return height_inches
   else:
     return 0
