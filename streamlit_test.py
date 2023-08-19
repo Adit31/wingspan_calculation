@@ -6,9 +6,45 @@ from mediapipe.framework.formats import landmark_pb2
 import numpy as np
 import streamlit as st
 import tempfile
+import cv2
 
 pose_landmark_model_path = 'pose_landmarker_full.task'
 hand_landmark_model_path = 'hand_landmarker.task'
+
+def calculate_height(image_path_height, length_inches, length_pixels):
+  mp_pose = mp.solutions.pose
+  pose = mp_pose.Pose()
+  
+  image = cv2.imread(image_path_height)
+  height, width, _ = image.shape
+  results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+  
+  if results.pose_landmarks:
+      nose = results.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE.value]
+      left_eye = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_EYE.value]
+      right_eye = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE.value]
+      left_foot = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value]
+      right_foot = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value]
+  
+      nose_y = nose.y * height
+      left_eye_y = left_eye.y * height
+      right_eye_y = right_eye.y * height
+  
+      mid_eyes_y = (left_eye_y + right_eye_y) / 2
+      forehead_height = nose_y - mid_eyes_y
+      head_top_y = mid_eyes_y + forehead_height
+  
+      left_foot_y = left_foot.y * height
+      right_foot_y = right_foot.y * height
+      avg_foot_y = (left_foot_y + right_foot_y) / 2
+      height_pixels = avg_foot_y - head_top_y
+  
+      pixels_to_inches = length_inches / length_pixels
+  
+      height_inches = height_pixels * ratio
+      return height_inches
+  else:
+    return 0
 
 def draw_pose_landmarks_on_image(rgb_image, detection_result):
   pose_landmarks_list = detection_result.pose_landmarks
@@ -55,7 +91,7 @@ def calculate_palm(image_path_palm):
         st.write("The application requires at least one arm to be visible in the frame")
         return 0
 
-def calculate_wingspan(image_path_wingspan, height_inches, height_pixels):
+def calculate_wingspan(image_path_wingspan, length_inches, length_pixels):
     try:
         base_options = python.BaseOptions(model_asset_path=pose_landmark_model_path)
         options = vision.PoseLandmarkerOptions(
@@ -85,7 +121,7 @@ def calculate_wingspan(image_path_wingspan, height_inches, height_pixels):
     
         total_wingspan_pixels = wingspan_pixels + 2*palm_pixels
     
-        pixels_to_inches = height_inches / height_pixels
+        pixels_to_inches = length_inches / length_pixels
         total_wingspan_inches = total_wingspan_pixels * pixels_to_inches
     
         return total_wingspan_inches, annotated_image
@@ -94,18 +130,18 @@ def calculate_wingspan(image_path_wingspan, height_inches, height_pixels):
         return 0, image_path_wingspan
 
 st.title("Calculate Wingspan")
-
-#uploaded_file = st.file_uploader("Choose an image...", type="jpg")
 uploaded_file = st.camera_input("Take a picture")
 
 if uploaded_file is not None:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
         temp_file.write(uploaded_file.read())
         temp_path = temp_file.name
-    height_inches = st.number_input("Enter the static height in inches:", value=1.0)
-    height_pixels = st.number_input("Enter the static height in pixels:", value=2.5)
+    length_inches = st.number_input("Enter the static height in inches:", value=1.0)
+    length_pixels = st.number_input("Enter the static height in pixels:", value=2.5)
 
-    wingspan, annotated_image = calculate_wingspan(temp_path, height_inches, height_pixels)
+    wingspan, annotated_image = calculate_wingspan(temp_path, length_inches, length_pixels)
+    height = calculate_height(temp_path, length_inches, length_pixels)
     
     st.image(annotated_image, caption="Annotated Image", use_column_width=True)
     st.write("Wingspan is:", wingspan, "inches")
+    st.write("Height is:", height, "inches")
