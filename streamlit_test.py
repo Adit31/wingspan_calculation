@@ -102,8 +102,8 @@ if uploaded_file is not None:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
         temp_file.write(uploaded_file.read())
         temp_path = temp_file.name
-    height_inches = st.number_input("Enter the static height in inches:", value=40.0)
-    height_pixels = st.number_input("Enter the static height in pixels:", value=100.0)
+    height_inches = st.number_input("Enter the static height in inches:", value=1.0)
+    height_pixels = st.number_input("Enter the static height in pixels:", value=2.5)
 
     wingspan, annotated_image = calculate_wingspan(temp_path, height_inches, height_pixels)
     
