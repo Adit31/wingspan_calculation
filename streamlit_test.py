@@ -25,6 +25,7 @@ def calculate_height(image_path_height, length_inches, length_pixels):
       right_eye = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE.value]
       left_foot = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value]
       right_foot = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value]
+      st.write(nose, left_eye, right_eye, left_foot, right_foot)
   
       nose_y = nose.y * height
       left_eye_y = left_eye.y * height
