@@ -121,14 +121,27 @@ def calculate_wingspan(image_path_wingspan, length_inches, length_pixels):
         palm_pixels = calculate_palm(image_path_wingspan)
     
         total_wingspan_pixels = wingspan_pixels + 2*palm_pixels
+
+        nose = detection_result.pose_landmarks[0][0]
+        left_eye = detection_result.pose_landmarks[0][1]
+        right_eye = detection_result.pose_landmarks[0][4]
+        left_heel = detection_result.pose_landmarks[0][29]
+        right_heel = detection_result.pose_landmarks[0][30]
+
+        y_eye = (left_eye.y + right_eye.y)/2 *height
+        y_heel = (left_heel.y + right_heel.y)/2 *height
+        forehead = 1.5 * abs(nose.y - y_eye)
+
+        total_height_pixels = abs(y_eye - y_heel) + forehead
     
         pixels_to_inches = length_inches / length_pixels
         total_wingspan_inches = total_wingspan_pixels * pixels_to_inches
+        total_height_inches = total_height_pixels * pixels_to_inches
     
-        return total_wingspan_inches, annotated_image
+        return total_wingspan_inches, total_height_inches, annotated_image
     except IndexError:
         st.write("The application requires at least one arm to be visible in the frame")
-        return 0, image_path_wingspan
+        return 0, 0, image_path_wingspan
 
 st.title("Calculate Wingspan")
 uploaded_file = st.camera_input("Take a picture")
@@ -140,8 +153,8 @@ if uploaded_file is not None:
     length_inches = st.number_input("Enter the static height in inches:", value=1.0)
     length_pixels = st.number_input("Enter the static height in pixels:", value=2.5)
 
-    wingspan, annotated_image = calculate_wingspan(temp_path, length_inches, length_pixels)
-    height = calculate_height(temp_path, length_inches, length_pixels)
+    wingspan, height, annotated_image = calculate_wingspan(temp_path, length_inches, length_pixels)
+    # height = calculate_height(temp_path, length_inches, length_pixels)
     
     st.image(annotated_image, caption="Annotated Image", use_column_width=True)
     st.write("Wingspan is:", wingspan, "inches")
