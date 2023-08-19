@@ -33,7 +33,7 @@ def calculate_height(image_path_height, length_inches, length_pixels):
   
       mid_eyes_y = (left_eye_y + right_eye_y) / 2
       forehead_height = nose_y - mid_eyes_y
-      head_top_y = mid_eyes_y + forehead_height
+      head_top_y = mid_eyes_y - forehead_height
   
       left_foot_y = left_foot.y * height
       right_foot_y = right_foot.y * height
