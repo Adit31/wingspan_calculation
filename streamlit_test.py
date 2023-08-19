@@ -55,7 +55,7 @@ def calculate_palm(image_path_palm):
         st.write("The application requires at least one arm to be visible in the frame")
         return 0
 
-def calculate_wingspan(image_path_wingspan, height_meters, height_pixels):
+def calculate_wingspan(image_path_wingspan, height_inches, height_pixels):
     try:
         base_options = python.BaseOptions(model_asset_path=pose_landmark_model_path)
         options = vision.PoseLandmarkerOptions(
@@ -85,10 +85,10 @@ def calculate_wingspan(image_path_wingspan, height_meters, height_pixels):
     
         total_wingspan_pixels = wingspan_pixels + 2*palm_pixels
     
-        pixels_to_meters = height_meters / height_pixels
-        total_wingspan_meters = total_wingspan_pixels * pixels_to_meters
+        pixels_to_inches = height_inches / height_pixels
+        total_wingspan_inches = total_wingspan_pixels * pixels_to_inches
     
-        return total_wingspan_meters, annotated_image
+        return total_wingspan_inches, annotated_image
     except IndexError:
         st.write("The application requires at least one arm to be visible in the frame")
         return 0, image_path_wingspan
@@ -102,11 +102,10 @@ if uploaded_file is not None:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
         temp_file.write(uploaded_file.read())
         temp_path = temp_file.name
-    height_meters = st.number_input("Enter the static height in meters:", value=1.0)
+    height_inches = st.number_input("Enter the static height in inches:", value=40.0)
     height_pixels = st.number_input("Enter the static height in pixels:", value=100.0)
 
-    wingspan, annotated_image = calculate_wingspan(temp_path, height_meters, height_pixels)
-    wingspan *= 39.3701
+    wingspan, annotated_image = calculate_wingspan(temp_path, height_inches, height_pixels)
     
     st.image(annotated_image, caption="Annotated Image", use_column_width=True)
     st.write("Wingspan is:", wingspan, "inches")
